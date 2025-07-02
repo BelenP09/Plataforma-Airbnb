@@ -1,11 +1,4 @@
-<style>
-body {
-    background-image: url('image/Image (5).jpg');
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-}
-</style>
+![Dashboard de análisis de Airbnb](image/Image%20(4).jpg)
 
 # Plataforma de Análisis de Airbnb
 
@@ -121,3 +114,6 @@ Este proyecto está licenciado bajo la Licencia MIT - vea el archivo [LICENSE.md
 ## Contacto
 
 Para consultas o colaboraciones, por favor contacte a través de [email@ejemplo.com](mailto:email@ejemplo.com) o abra un issue en este repositorio.
+
+![Visualización de datos de propiedades](image/Image%20(5).jpg)
+
