@@ -779,7 +779,7 @@ if df is not None:
                                 elif price > max_price * 0.4:
                                     return colors_airbnb['Babu']
                                 else:
-                                    return colors_airbnb['Foggy']
+                                    return colors_airbnb['background']
                             for idx, row in city_stats.iterrows():
                                 popup_html = f"""
                                 <div style="font-family: 'Segoe UI', Arial, sans-serif; width: 300px; padding: 15px;">
@@ -972,29 +972,29 @@ if df is not None:
                                     col.metric(f"Ocupación {ciudad}", "N/A")
                             else:
                                 col.metric(f"Ocupación {ciudad}", "N/A")
-                                
-                            # --- Tasa de ocupación media entre todos los años, 2024 y 2025 (en la misma fila con métricas Streamlit) ---
-                            noches_ocupadas_total = df_ult_por_listado['noches_ocupadas'].sum()
-                            capacidad_total = df_ult_por_listado['dias_del_año'].sum()
-                            tasa_ocupacion_media = (noches_ocupadas_total / capacidad_total) * 100
 
-                            df_2024 = df_ult_por_listado[df_ult_por_listado['year'] == 2024]
-                            noches_ocupadas_2024 = df_2024['noches_ocupadas'].sum()
-                            capacidad_total_2024 = df_2024['dias_del_año'].sum()
-                            tasa_ocupacion_2024 = (noches_ocupadas_2024 / capacidad_total_2024) * 100 if capacidad_total_2024 > 0 else None
+                        # --- Tasa de ocupación media entre todos los años, 2024 y 2025 (en la misma fila con métricas Streamlit) ---
+                        noches_ocupadas_total = df_ult_por_listado['noches_ocupadas'].sum()
+                        capacidad_total = df_ult_por_listado['dias_del_año'].sum()
+                        tasa_ocupacion_media = (noches_ocupadas_total / capacidad_total) * 100
 
-                            df_2025 = df_ult_por_listado[df_ult_por_listado['year'] == 2025]
-                            noches_ocupadas_2025 = df_2025['noches_ocupadas'].sum()
-                            capacidad_total_2025 = df_2025['dias_del_año'].sum()
-                            tasa_ocupacion_2025 = (noches_ocupadas_2025 / capacidad_total_2025) * 100 if capacidad_total_2025 > 0 else None
+                        df_2024 = df_ult_por_listado[df_ult_por_listado['year'] == 2024]
+                        noches_ocupadas_2024 = df_2024['noches_ocupadas'].sum()
+                        capacidad_total_2024 = df_2024['dias_del_año'].sum()
+                        tasa_ocupacion_2024 = (noches_ocupadas_2024 / capacidad_total_2024) * 100 if capacidad_total_2024 > 0 else None
 
-                            col1, col2, col3 = st.columns(3)
-                            with col1:
-                                st.metric("Ocupación media (todos los años)", f"{tasa_ocupacion_media:.2f}%")
-                            with col2:
-                                st.metric("Ocupación 2024", f"{tasa_ocupacion_2024:.2f}%" if tasa_ocupacion_2024 is not None else "N/A")
-                            with col3:
-                                st.metric("Ocupación 2025", f"{tasa_ocupacion_2025:.2f}%" if tasa_ocupacion_2025 is not None else "N/A")
+                        df_2025 = df_ult_por_listado[df_ult_por_listado['year'] == 2025]
+                        noches_ocupadas_2025 = df_2025['noches_ocupadas'].sum()
+                        capacidad_total_2025 = df_2025['dias_del_año'].sum()
+                        tasa_ocupacion_2025 = (noches_ocupadas_2025 / capacidad_total_2025) * 100 if capacidad_total_2025 > 0 else None
+
+                        col1, col2, col3 = st.columns(3)
+                        with col1:
+                            st.metric("Ocupación media (todos los años)", f"{tasa_ocupacion_media:.2f}%")
+                        with col2:
+                            st.metric("Ocupación 2024", f"{tasa_ocupacion_2024:.2f}%" if tasa_ocupacion_2024 is not None else "N/A")
+                        with col3:
+                            st.metric("Ocupación 2025", f"{tasa_ocupacion_2025:.2f}%" if tasa_ocupacion_2025 is not None else "N/A")
                     else:
                         st.info("No hay datos históricos de ocupación anual disponibles para mostrar la evolución por ciudad.")                
 
@@ -1112,83 +1112,26 @@ if df is not None:
                                 )
                                 st.plotly_chart(fig2, use_container_width=True)
                                 
-                                # 1. Calcular precio medio general y por región
-                                precio_medio_general = df_ult_por_listado['price'].mean()
-                                precio_medio_region = df_ult_por_listado.groupby('origen')['price'].mean().sort_values(ascending=False)
+                                # --- Gráfico de precio medio por noche ponderado por noches ocupadas con paleta Airbnb ---
+ 
+                                # Paleta de colores Airbnb por región
+                                airbnb_palette = {
+                                    'Mallorca': '#FF5A5F',   # primary
+                                    'Málaga': '#00A699',     # secondary
+                                    'Valencia': '#FC642D'    # accent
+                                }
 
-                                print(f"💶 Precio medio general: {precio_medio_general:.2f} €\n")
-
-                                # 2. Crear tabla resumen
-                                tabla_precio = precio_medio_region.reset_index().rename(columns={'price': 'Precio Medio (€)', 'region': 'Región'})
-                                tabla_precio['Precio Medio (€)'] = tabla_precio['Precio Medio (€)'].round(2)
-
-                                print("🏙️ Precio medio por región:")
-                                st.dataframe(tabla_precio)
-
-                                fig, ax = plt.subplots(figsize=(8, 5))
-                                norm = plt.Normalize(tabla_precio['Precio Medio (€)'].min(), tabla_precio['Precio Medio (€)'].max())
-                                sm = plt.cm.ScalarMappable(cmap="coolwarm", norm=norm)
-                                bar_colors = sm.to_rgba(tabla_precio['Precio Medio (€)'])
-
-                                bars = ax.barh(tabla_precio['origen'], tabla_precio['Precio Medio (€)'], color=bar_colors, edgecolor=colors_airbnb['Rausch'])
-                                ax.set_xlabel('Precio Medio (€)')
-                                ax.set_title('💶 Precio Medio por Región')
-                                ax.invert_yaxis()
-
-                                for i, v in enumerate(tabla_precio['Precio Medio (€)']):
-                                    ax.text(v + 1, i, f"{v:.2f} €", va='center', fontsize=9, fontweight='bold')
-
-                                cbar = plt.colorbar(sm, orientation='vertical', pad=0.01, ax=ax)
-                                cbar.set_label('Precio Medio (€)', rotation=270, labelpad=15)
-
-                                plt.tight_layout()
-                                st.pyplot(plt)
-
-                                # Categorización del precio: bajo, medio, alto
-
-                                # Usamos los percentiles 33 y 66 para definir los cortes
-                                p33 = df_ult_por_listado['price'].quantile(0.33)
-                                p66 = df_ult_por_listado['price'].quantile(0.66)
-
-                                def categorizar_precio(precio):
-                                    if precio <= p33:
-                                        return 'Precio Bajo'
-                                    elif precio <= p66:
-                                        return 'Precio Medio'
-                                    else:
-                                        return 'Precio Alto'
-
-                                df_ult_por_listado['categoria_precio'] = df_ult_por_listado['price'].apply(categorizar_precio)
-
-                                # Resumen de la distribución con separador de miles
-                                print("Distribución de la categoría de precio:")
-                                conteo = df_ult_por_listado['categoria_precio'].value_counts()
-                                for categoria, cantidad in conteo.items():
-                                    print(f"{categoria}: {cantidad:,} €")
-
-                                # Tabla dinámica: filas=origen, columnas=categoria_precio, valores=precio medio
-                                pivot = df_ult_por_listado.pivot_table(
-                                    index='origen',
-                                    columns='categoria_precio',
-                                    values='price',
-                                    aggfunc='mean'
+                                # Calcular el precio medio por noche ponderado por noches ocupadas para cada región
+                                tabla_precio_ponderado = (
+                                    df_ult_por_listado
+                                    .groupby('origen')
+                                    .apply(lambda x: np.average(x['price'], weights=x['noches_ocupadas']))
+                                    .reset_index(name='Precio Medio por Noche (€)')
+                                    .sort_values('Precio Medio por Noche (€)', ascending=False)
                                 )
 
-                                plt.figure(figsize=(8, 5))
-                                sns.heatmap(
-                                    pivot,
-                                    annot=True,
-                                    fmt=".2f",
-                                    cmap="YlOrRd",
-                                    linewidths=0.5,
-                                    cbar_kws={'label': 'Precio Medio (€)'}
-                                )
-                                plt.title('Heatmap de Precio Medio por Origen y Categoría de Precio')
-                                plt.xlabel('Categoría de Precio')
-                                plt.ylabel('Origen')
-                                plt.tight_layout()
-                                plt.show()
-                                # Tabla de relación entre el precio del alojamiento y la valoración de los hosts
+                                # Asignar color Airbnb a cada barra según la región
+                                bar_colors = tabla_precio_ponderado['origen'].map(airbnb_palette)
 
                                 # --- Crear host_perf si no existe ---
                                 if 'host_perf' not in globals():
@@ -1235,9 +1178,6 @@ if df is not None:
                                 tabla_precio_valoracion.columns = ['Categoría Valoración Host', 'Nº Alojamientos', 'Precio Medio (€)', 'Mediana (€)', 'Desviación (€)']
                                 tabla_precio_valoracion = tabla_precio_valoracion.sort_values('Precio Medio (€)', ascending=False)
 
-                                print("Relación entre el precio del alojamiento y la valoración de los hosts:")
-                                print(tabla_precio_valoracion)
-
                                 # Si no existe, añade la columna de calificación promedio del host al dataframe de alojamientos
                                 if 'calificacion_promedio' not in df_ult_por_listado.columns:
                                     df_ult_por_listado = df_ult_por_listado.merge(
@@ -1253,17 +1193,43 @@ if df is not None:
                                 # Calcular la correlación de Pearson
                                 correlacion = df_corr['price'].corr(df_corr['calificacion_promedio'])
 
-                                print(f"Coeficiente de correlación (Pearson) entre precio y calificación promedio del host: {correlacion:.3f}")
+                                # Visualización: ambos gráficos en la misma fila con Streamlit
+                                col1, col2 = st.columns(2)
 
-                                # Visualización: scatter plot
-                                plt.figure(figsize=(7,4))
-                                sns.scatterplot(data=df_corr, x='calificacion_promedio', y='price', alpha=0.5)
-                                plt.title('Relación entre Precio y Calificación Promedio del Host')
-                                plt.xlabel('Calificación Promedio del Host')
-                                plt.ylabel('Precio (€)')
-                                plt.grid(True, alpha=0.3)
-                                plt.tight_layout()
-                                st.pyplot(plt)
+                                with col1:
+                                    fig1, ax1 = plt.subplots(figsize=(7, 4))
+                                    bars = ax1.barh(
+                                        tabla_precio_ponderado['origen'],
+                                        tabla_precio_ponderado['Precio Medio por Noche (€)'],
+                                        color=bar_colors,
+                                        edgecolor='grey'
+                                    )
+                                    ax1.set_xlabel('Precio Medio por Noche (€)')
+                                    ax1.set_title('💶 Precio Medio por Noche y Región (ponderado)')
+                                    ax1.invert_yaxis()
+                                    for i, v in enumerate(tabla_precio_ponderado['Precio Medio por Noche (€)']):
+                                        ax1.text(v + 1, i, f"{v:.2f} €", va='center', fontsize=9, fontweight='bold')
+                                    # Leyenda personalizada
+                                    from matplotlib.patches import Patch
+                                    legend_elements = [
+                                        Patch(facecolor=airbnb_palette['Mallorca'], label='Mallorca'),
+                                        Patch(facecolor=airbnb_palette['Málaga'], label='Málaga'),
+                                        Patch(facecolor=airbnb_palette['Valencia'], label='Valencia')
+                                    ]
+                                    ax1.legend(handles=legend_elements, title='Región', loc='lower right')
+                                    plt.tight_layout()
+                                    st.pyplot(fig1)
+
+                                with col2:
+                                    fig2, ax2 = plt.subplots(figsize=(7, 4))
+                                    sns.scatterplot(data=df_corr, x='calificacion_promedio', y='price', alpha=0.5, ax=ax2)
+                                    ax2.set_title('Relación entre Precio y Calificación Promedio del Host')
+                                    ax2.set_xlabel('Calificación Promedio del Host')
+                                    ax2.set_ylabel('Precio (€)')
+                                    ax2.grid(True, alpha=0.3)
+                                    plt.tight_layout()
+                                    st.pyplot(fig2)
+                                    st.caption(f"Coeficiente de correlación (Pearson): {correlacion:.3f}")
                             
                             
                         st.markdown("### Málaga")
