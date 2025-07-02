@@ -103,9 +103,9 @@ Plataforma-Airbnb/
 
 ## Equipo
 
-- **Belén Parrado Serrano** - Analista de Datos - [GitHub](https://github.com/usuario)
-- **Victor Marti** - Analista de Datos - [GitHub](https://github.com/usuario)
-- **Andrei Baidurov** - Analista de Datos - [GitHub](https://github.com/usuario)
+- **Belén Parrado Serrano** - Analista de Datos - [GitHub](https://github.com/BelenP09)
+- **Victor Marti** - Analista de Datos - [GitHub](https://github.com/Victor-Marti)
+- **Andrei Baidurov** - Analista de Datos - [GitHub](https://github.com/AndreiKukushkinBaidurov)
 
 ## Licencia
 
