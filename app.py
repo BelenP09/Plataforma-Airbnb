@@ -463,6 +463,7 @@ if df is not None:
             
             with tab_general:
                 st.markdown("### 📊 Vista General del Mercado")
+                st.markdown("### Dashboard Integral del Mercado")
                 
                 if 'origen' in filtered_df.columns:
                     # =======================
@@ -505,7 +506,7 @@ if df is not None:
                         # =======================
                         # 3. DASHBOARD MODERNO INTEGRAL
                         # =======================
-                        st.markdown("### Dashboard Integral del Mercado")
+                  
                         fig = make_subplots(
                             rows=3, cols=3,
                             subplot_titles=[
@@ -1350,7 +1351,7 @@ if df is not None:
                         )
                         st.plotly_chart(fig, use_container_width=True)
 
-
+                        st.markdown("")
                         st.markdown("### Valencia")
 
                         # --- Análisis específico para Valencia ---
@@ -1707,12 +1708,12 @@ if df is not None:
                         x='origen',
                         y='weighted_satisfaction',
                         color='origen',
-                        color_discrete_sequence=[colors_airbnb['Babu'], colors_airbnb['Rausch'], colors_airbnb['Arches']],
+                        color_discrete_sequence=[colors_airbnb['Arches'], colors_airbnb['Babu'], colors_airbnb['Rausch']],
                         title="Distribución de satisfacción ponderada por ciudad"
                     )
                     st.plotly_chart(fig3, use_container_width=True)
 
-                    # Gráfico de componentes de satisfacción por ciudad
+                    # Gráfico de componentes de satisfacción por ciudad con paleta Airbnb
                     components = [
                         'review_scores_rating', 'review_scores_cleanliness', 'review_scores_communication',
                         'review_scores_accuracy', 'review_scores_checkin', 'review_scores_location', 'review_scores_value'
@@ -1723,6 +1724,18 @@ if df is not None:
                     ]
                     city_components_plot = city_components.copy()
                     city_components_plot.columns = component_names
+
+                    # Asignar colores de la paleta Airbnb a cada ciudad
+                    # Puedes ajustar el mapeo según tus ciudades principales
+                    airbnb_palette = {
+                        'Mallorca': colors_airbnb['Rausch'],
+                        'Málaga': colors_airbnb['Babu'],
+                        'Valencia': colors_airbnb['Arches']
+                    }
+                    # Si hay más ciudades, asignar colores adicionales de la paleta
+                    unique_cities = city_components_plot.index.tolist()
+                    color_map = {city: airbnb_palette.get(city, colors_airbnb['Hof']) for city in unique_cities}
+
                     fig4 = px.bar(
                         city_components_plot.reset_index().melt(id_vars='origen'),
                         x='variable',
@@ -1730,7 +1743,8 @@ if df is not None:
                         color='origen',
                         barmode='group',
                         title="Componentes de satisfacción por ciudad",
-                        labels={'variable': 'Componente', 'value': 'Puntuación promedio'}
+                        labels={'variable': 'Componente', 'value': 'Puntuación promedio'},
+                        color_discrete_map=color_map
                     )
                     st.plotly_chart(fig4, use_container_width=True)
 
@@ -1747,7 +1761,7 @@ if df is not None:
 
                     # Tabla resumen por ciudad
                     st.markdown("##### 📋 Resumen de satisfacción por ciudad")
-                    st.dataframe(city_summary.style.background_gradient(cmap='Blues'), use_container_width=True)
+                    st.dataframe(city_summary.style.background_gradient(cmap='Rausch'), use_container_width=True)
 
                     # Análisis por tipo de host en cada ciudad
                     st.markdown("##### 👥 Ventaja de Superhost por ciudad")
