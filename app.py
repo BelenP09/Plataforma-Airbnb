@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+from matplotlib.colors import LinearSegmentedColormap
 import numpy as np
 import sqlalchemy
 from sqlalchemy import create_engine
@@ -31,6 +32,13 @@ colors_airbnb = {
     'background': '#F7F7F7',
     'white': '#FFFFFF'
 }
+
+# Crear un colormap personalizado de Airbnb para tablas
+airbnb_cmap = LinearSegmentedColormap.from_list(
+    "airbnb",
+    [colors_airbnb["Rausch"], colors_airbnb["Babu"], colors_airbnb["Arches"]],
+    N=256
+)
 
 # CSS personalizado con colores de Airbnb
 st.markdown(f"""
@@ -695,10 +703,15 @@ if df is not None:
                         fig.update_yaxes(title_text="Puntuación (%)", row=3, col=3)
                         st.plotly_chart(fig, use_container_width=True)
 
-                        # =======================
-                        # 4. RESUMEN EJECUTIVO
-                        # =======================
+
+                        # Mostrar tabla resumen con gradiente Airbnb
                         st.markdown("#### 📋 Resumen Ejecutivo del Mercado")
+                        city_summary = city_stats[["origen", "avg_price", "total_listings", "avg_satisfaction", "avg_occupancy", "avg_revenue"]].copy()
+                        city_summary.columns = [
+                            "Ciudad", "Precio Medio", "Nº Anuncios", "Satisfacción", "Ocupación (%)", "Ingresos (€)"
+                        ]
+                        st.dataframe(city_summary.style.background_gradient(cmap=airbnb_cmap), use_container_width=True)
+
                         st.info(
                             f"**Mercados Analizados:** {len(city_stats)} principales ciudades españolas\n"
                             f"**Total Propiedades:** {city_stats['total_listings'].sum():,} anuncios activos\n"
@@ -1761,7 +1774,7 @@ if df is not None:
 
                     # Tabla resumen por ciudad
                     st.markdown("##### 📋 Resumen de satisfacción por ciudad")
-                    st.dataframe(city_summary.style.background_gradient(cmap='Rausch'), use_container_width=True)
+                    st.dataframe(city_summary.style.background_gradient(cmap=airbnb_cmap), use_container_width=True)
 
                     # Análisis por tipo de host en cada ciudad
                     st.markdown("##### 👥 Ventaja de Superhost por ciudad")
