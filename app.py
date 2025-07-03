@@ -681,6 +681,8 @@ if df is not None:
                             title=dict(
                                 text="Dashboard Integral de Análisis del Mercado Airbnb",
                                 x=0.5,
+                                xanchor='center',
+                                yanchor='top',
                                 font=dict(size=24, family="Arial Black")
                             ),
                             height=1200,
