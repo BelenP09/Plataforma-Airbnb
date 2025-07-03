@@ -9,3 +9,4 @@ pyodbc
 plotly
 folium
 seaborn
+streamlit-folium
